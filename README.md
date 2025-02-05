@@ -22,3 +22,11 @@ Derivation paths to try that could have been used in this early wallet:
 - `m/44'/877'/0'`
 - `m/44'/877'/0'/0/0`
 - `m/44'/877'/0'/0'/0'`
+
+## Tests
+
+To run unit test, issue the following command:
+
+```bash
+cargo test
+```
