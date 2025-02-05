@@ -3,6 +3,7 @@ pub mod types;
 
 use crypto::{keys, mnemonic, utils};
 use types::address;
+use zeroize::Zeroize;
 
 const INPUT_ERROR: &str = "Enountered error obtaining input from user!";
 
@@ -16,17 +17,20 @@ fn main() {
             let hd_path = utils::get_input("Enter derivation path:").expect(INPUT_ERROR);
             println!("Using path: {}\n", &hd_path);
 
-            let seed = m
+            let mut seed = m
                 .to_seed(None)
                 .expect("Conversion to seed bytes should not fail!");
-            let wallet = keys::HDWallet::new(seed).expect("Could not instantiate wallet!");
+            let wallet = keys::HDWallet::new(seed.clone()).expect("Could not instantiate wallet!");
+            seed.zeroize();
 
             let keypair = wallet.derive(hd_path).expect("Invalid path!");
 
-            let private_key = keypair.private().to_hex();
+            let mut private_key = keypair.private().to_hex();
             println!("Private Key: {}", &private_key);
 
-            let address_util = address::Address::new(private_key);
+            let address_util = address::Address::new(private_key.clone());
+            private_key.zeroize();
+
             let public_key = address_util.public();
             let address = address_util.implicit();
 
