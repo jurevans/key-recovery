@@ -1,4 +1,5 @@
 use bip0039::Count;
+use zeroize::{Zeroize, ZeroizeOnDrop};
 
 #[derive(Copy, Clone)]
 pub enum PhraseSize {
@@ -6,7 +7,7 @@ pub enum PhraseSize {
     N24 = 24,
 }
 
-#[derive(Debug)]
+#[derive(Debug, ZeroizeOnDrop)]
 pub struct Mnemonic {
     phrase: String,
 }
@@ -37,7 +38,7 @@ impl Mnemonic {
     }
 
     pub fn to_seed(&self, passphrase: Option<String>) -> Result<Vec<u8>, String> {
-        let passphrase = match passphrase {
+        let mut passphrase = match passphrase {
             Some(passphrase) => passphrase,
             None => "".to_string(),
         };
@@ -46,6 +47,8 @@ impl Mnemonic {
             Err(_) => return Err(String::from("Unable to parse mnemonic!")),
         };
         let seed: &[u8] = &mnemonic.to_seed(&passphrase);
+
+        passphrase.zeroize();
 
         Ok(Vec::from(seed))
     }
@@ -88,6 +91,6 @@ mod tests {
     #[should_panic]
     fn invalid_phrase_should_panic() {
         let bad_phrase = "caught pig embody hip goose like become";
-        let _ = Mnemonic::from_phrase(bad_phrase.into()).expect("This should fail");
+        let _ = Mnemonic::from_phrase(bad_phrase).expect("This should fail");
     }
 }

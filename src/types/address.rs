@@ -9,6 +9,7 @@ use namada_sdk::{
 };
 use std::io::Error;
 use std::str::FromStr;
+use zeroize::Zeroize;
 
 /// Helper function to bech32 encode a public key from bytes
 pub fn public_key_to_bech32(bytes: Vec<u8>) -> Result<String, Error> {
@@ -17,6 +18,7 @@ pub fn public_key_to_bech32(bytes: Vec<u8>) -> Result<String, Error> {
     Ok(public_key.to_string())
 }
 
+#[derive(Debug)]
 pub struct Address {
     implicit: address::Address,
     public: PublicKey,
@@ -24,13 +26,16 @@ pub struct Address {
 }
 
 impl Address {
-    pub fn new(secret: String) -> Address {
+    pub fn new(mut secret: String) -> Address {
         let private = SecretKey::Ed25519(
             key::ed25519::SecretKey::from_str(&secret).expect("ed25519 encoding should not fail"),
         );
 
         #[allow(clippy::useless_conversion)]
         let public = PublicKey::from(private.ref_to());
+
+        secret.zeroize();
+
         let hash = PublicKeyHash::from(&public);
         let implicit = address::Address::Implicit(address::ImplicitAddress::from(&public));
 

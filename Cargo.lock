@@ -3411,6 +3411,7 @@ dependencies = [
  "hex",
  "namada_sdk",
  "thiserror 1.0.69",
+ "zeroize",
 ]
 
 [[package]]

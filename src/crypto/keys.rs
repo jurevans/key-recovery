@@ -1,5 +1,6 @@
 use bip32::XPrv;
 use thiserror::Error;
+use zeroize::ZeroizeOnDrop;
 
 #[derive(Debug, Error)]
 pub enum HDWalletError {
@@ -15,7 +16,7 @@ pub enum HDWalletError {
     InvalidSeed,
 }
 
-#[derive(Debug)]
+#[derive(Debug, ZeroizeOnDrop)]
 pub struct Key {
     bytes: [u8; 32],
 }
@@ -42,7 +43,7 @@ impl Key {
 }
 
 /// An ed25519 keypair
-#[derive(Debug)]
+#[derive(Debug, ZeroizeOnDrop)]
 pub struct Keypair {
     private: Key,
     public: Key,
@@ -62,7 +63,7 @@ impl Keypair {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, ZeroizeOnDrop)]
 pub struct HDWallet {
     seed: [u8; 64],
 }

@@ -10,4 +10,5 @@ ed25519-dalek = {version = "1.0.1", default-features = false, features = ["rand"
 hex = "0.4.3"
 namada_sdk = { git = "https://github.com/anoma/namada", rev="e74fdc71aa2ea6f192c0151f492fb770e1c0cfcb", default-features = false }
 thiserror = "1.0.30"
+zeroize = "1.8.1"
 
