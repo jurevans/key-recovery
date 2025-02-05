@@ -8,8 +8,9 @@ use zeroize::Zeroize;
 const INPUT_ERROR: &str = "Enountered error obtaining input from user!";
 
 fn main() {
-    let phrase = utils::get_input("Enter mnemonic phrase:").expect(INPUT_ERROR);
+    let mut phrase = utils::get_input("Enter mnemonic phrase:").expect(INPUT_ERROR);
     let m = mnemonic::Mnemonic::from_phrase(&phrase);
+    phrase.zeroize();
 
     match m {
         Ok(m) => {
