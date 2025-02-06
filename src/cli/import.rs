@@ -5,9 +5,12 @@ use zeroize::Zeroize;
 use serde::Deserialize;
 use toml::{self, Value};
 
-use crate::crypto::{
-    aead::AEAD,
-    utils::{get_input, prompt_password},
+use crate::{
+    crypto::{
+        aead::AEAD,
+        utils::{get_input, prompt_password},
+    },
+    types::address,
 };
 
 #[derive(Debug, Deserialize)]
@@ -55,7 +58,8 @@ pub fn import() {
         }
     };
 
-    let account = get_input("\nWhich account would you like to recover? ").expect("Invalid input");
+    let account =
+        get_input("\nEnter the alias of the account to recover: ").expect("Invalid input");
 
     let data: Wallet = match toml::from_str(&contents) {
         Ok(d) => d,
@@ -72,7 +76,7 @@ pub fn import() {
         if let Some(entry) = entry_maybe {
             let entry_parts = entry.split(":").collect::<Vec<&str>>();
             let prefix = entry_parts.first().expect("Must have a prefix");
-            let secret = entry_parts.get(1).expect("Must have a key");
+            let secret = entry_parts.get(1).expect("Must have a secret");
 
             if prefix == &"encrypted" {
                 println!("Found encrypted secret: {}\n", &secret);
@@ -82,8 +86,18 @@ pub fn import() {
                 password.zeroize();
 
                 match decrypted {
-                    Ok(value) => {
-                        println!("Recovered secret: {}", &value);
+                    Ok(private_key_bytes) => {
+                        let mut private_key = hex::encode(private_key_bytes);
+                        println!("\nRecovered secret! {}\n", &private_key);
+                        let address_util =
+                            address::Address::new(private_key.clone()[2..].to_string());
+                        private_key.zeroize();
+
+                        let public_key = address_util.public();
+                        let address = address_util.implicit();
+
+                        println!("Address: {}", &address);
+                        println!("Public Key: {}", &public_key);
                     }
                     Err(err) => {
                         println!("{}", err);

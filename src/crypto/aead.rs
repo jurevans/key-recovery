@@ -1,5 +1,4 @@
 use orion::{aead, kdf};
-use std::str;
 use thiserror::Error;
 
 use crate::crypto::utils::{encryption_key, encryption_salt};
@@ -32,7 +31,7 @@ impl AEAD {
         AEAD::encrypt_from_bytes(data, password)
     }
 
-    pub fn decrypt(encrypted: Vec<u8>, password: String) -> Result<String, String> {
+    pub fn decrypt(encrypted: Vec<u8>, password: String) -> Result<Vec<u8>, String> {
         let salt_len = encryption_salt().len();
         let (raw_salt, cipher) = encrypted.split_at(salt_len);
 
@@ -44,18 +43,14 @@ impl AEAD {
         let decrypted_data: &[u8] = &aead::open(&encryption_key, cipher)
             .map_err(|err| format!("{}: {:?}", &DecryptionError::DecryptionError, err))?;
 
-        let s = match str::from_utf8(decrypted_data) {
-            Ok(v) => v,
-            Err(error) => return Err(error.to_string()),
-        };
-
-        Ok(String::from(s))
+        Ok(Vec::from(decrypted_data))
     }
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
+    use std::str;
 
     #[test]
     fn can_decrypt_encrypted_string() {
@@ -64,8 +59,9 @@ mod tests {
 
         let encrypted = AEAD::encrypt(message.clone(), password.clone());
         let decrypted = AEAD::decrypt(encrypted, password).expect("Value should be decrypted");
+        let s = str::from_utf8(&decrypted).expect("Should be UTF-8 encoded!");
 
-        assert_eq!(decrypted, message);
+        assert_eq!(s, message);
     }
 
     #[test]
@@ -76,7 +72,8 @@ mod tests {
 
         let encrypted = AEAD::encrypt_from_bytes(bytes, password.clone());
         let decrypted = AEAD::decrypt(encrypted, password).expect("Value should be decrypted");
+        let s = str::from_utf8(&decrypted).expect("Should be UTF-8 encoded!");
 
-        assert_eq!(decrypted, message);
+        assert_eq!(s, message);
     }
 }
