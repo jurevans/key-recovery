@@ -6,11 +6,9 @@ use serde::Deserialize;
 use toml::{self, Value};
 
 use crate::{
-    crypto::{
-        aead::AEAD,
-        utils::{get_input, prompt_password},
-    },
+    crypto::aead::AEAD,
     types::address,
+    utils::{get_input, prompt_password},
 };
 
 #[derive(Debug, Deserialize)]
@@ -43,7 +41,8 @@ struct Wallet {
     address_vp_types: Value,
 }
 
-pub fn import() {
+/// Export secret key from wallet.toml
+pub fn export() {
     println!("Parsing wallet.toml...");
     let filename = "wallet.toml";
 

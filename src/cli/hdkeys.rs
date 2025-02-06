@@ -1,5 +1,8 @@
-use crate::crypto::{keys, mnemonic, utils};
 use crate::types::address;
+use crate::{
+    crypto::{keys, mnemonic},
+    utils,
+};
 use zeroize::Zeroize;
 
 const INPUT_ERROR: &str = "Enountered error obtaining input from user!";

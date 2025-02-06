@@ -1,8 +1,9 @@
 # key-recovery
 
-This is a very simple utility to recover private keys from the obsolete `Namada Extension`. The inital _alpha_ version of
-the extension used a different derivation path, along with a different library for deriving private keys. This repo
-allows those keys to be recovered using a mnemonic phrase.
+This tool allows those keys to be recovered using a mnemonic phrase, or by decrypting secrets from a Namada `wallet.toml`.
+
+The inital _alpha_ version of the Namada extension used a different derivation path, along with a different library for deriving
+private keys.
 
 This work is based on the [a444534](https://github.com/anoma/namada-interface/tree/a444534f181f48a93f8ffda1ea65bc7b41d310b6/) of `namada-interface`.
 
@@ -21,18 +22,26 @@ To run the key-recoverer, simply run the following in a Linux or macOS terminal:
 cargo run
 ```
 
+**TODO**: Run `cargo run export`
+
 3. When prompted for an account to recover, enter the `alias` of the account you wish to recover, then when
    prompted, enter your password.
 
-### TODO:
+### Recovery from mnemonic using obsolete derivation
 
-Enable sub-command to run the mnemonic derivation (currently commented out in `main.rs`):
+**NOTE**: For now, uncomment the line `// cli::hdkeys::derive();`, then `cargo run`:
+
+**TODO**: Run `cargo run derive`
 
 - When prompted, enter your mnemonic
 - When prompted, enter derivation path, e.g., `m/44'/877'/0'/0/0`
 - Confirm the resulting `Address` and `Public Key` in the output, then copy the `Private Key`
 - In the current Namada Keychain, go to `Add Keys`, then choose the `Private Key` tab, and paste the key here
   - You should see the same Address & Public Key displayed here. You can now sign with this key in the current extension!
+
+### TODO:
+
+Enable sub-command to run the mnemonic derivation (currently commented out in `main.rs`):
 
 ## Tests
 
